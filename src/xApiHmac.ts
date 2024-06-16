@@ -2,23 +2,21 @@ import { createHmac } from "crypto"
 
 const baseUrl = 'https://api.xeggex.com/api/v2';
 
-export class xeggexApi
-{
+
+export class XeggexAPI {
+
 	apiKey: string
 	apiSecret: string
-	baseUrl:string
+	baseUrl: string
 
-	constructor(apiKey: string, apiSecret: string)
-	{
+	constructor(apiKey: string, apiSecret: string) {
 		this.apiKey = apiKey
 		this.apiSecret = apiSecret
-		this.baseUrl=baseUrl
+		this.baseUrl = baseUrl
 	}
 
-	signature(requestUrl: string, requestBodyString: any)
-	{
-		if (!requestBodyString)
-		{
+	signature(requestUrl: string, requestBodyString: any) {
+		if (!requestBodyString) {
 			requestBodyString = "";
 		}
 
@@ -27,9 +25,7 @@ export class xeggexApi
 		return createHmac('sha256', this.apiSecret).update(data).digest("hex")
 	}
 
-	getQuery(url: URL): Promise<any>
-	{
-
+	getQuery(url: URL): Promise<any> {
 		let nonce = Date.now();
 		let apiKey = this.apiKey;
 		let signature = this.signature(url.href, null);
@@ -45,10 +41,9 @@ export class xeggexApi
 		})
 			.then(res => res.json())
 
-	};
+	}
 
-	postQuery(url: URL, body: any): Promise<any>
-	{
+	postQuery(url: URL, body: any): Promise<any> {
 
 		let nonce = Date.now();
 		let apiKey = this.apiKey;
@@ -59,7 +54,7 @@ export class xeggexApi
 			headers: {
 				'Content-Type': 'application/json',
 				'X-API-KEY': apiKey,
-				'X-API-NONCE': nonce + "",
+				'X-API-NONCE': nonce.toString(),
 				'X-API-SIGN': signature
 			},
 			body: JSON.stringify(body)
@@ -68,105 +63,90 @@ export class xeggexApi
 
 	}
 
-	// Public Get
+	// Public API
 
-	assetGetList()
-	{
+	assetGetList() {
 		let url = new URL(this.baseUrl + '/asset/getlist');
 		return this.getQuery(url);
 	}
 
-	assetGetById(assetId)
-	{
+	assetGetById(assetId: string) {
 		let url = new URL(this.baseUrl + '/asset/getbyid/' + assetId);
 		return this.getQuery(url);
 	}
 
-	assetGetByTicker(ticker)
-	{
+	assetGetByTicker(ticker: string) {
 		let url = new URL(this.baseUrl + '/asset/getbyticker/' + ticker);
 		return this.getQuery(url);
 	}
 
-	marketGetList()
-	{
+	marketGetList() {
 		let url = new URL(this.baseUrl + '/market/getlist');
 		return this.getQuery(url);
 	}
 
-	marketGetById(marketId)
-	{
+	marketGetById(marketId) {
 		let url = new URL(this.baseUrl + '/market/getbyid/' + marketId);
 		return this.getQuery(url);
 	}
 
-	marketGetBySymbol(symbol)
-	{
+	marketGetBySymbol(symbol) {
 		let url = new URL(this.baseUrl + '/market/getbysymbol/' + symbol);
 		return this.getQuery(url);
 	}
 
-	poolGetList()
-	{
+	poolGetList() {
 		let url = new URL(this.baseUrl + '/pool/getlist');
 		return this.getQuery(url);
 	}
 
-	poolGetById(poolId)
-	{
+	poolGetById(poolId) {
 		let url = new URL(this.baseUrl + '/pool/getbyid/' + poolId);
 		return this.getQuery(url);
 	}
 
-	poolGetBySymbol(symbol)
-	{
+	poolGetBySymbol(symbol) {
 		let url = new URL(this.baseUrl + '/pool/getbysymbol/' + symbol);
 		return this.getQuery(url);
 	}
 
-	marketOrderBookBySymbol(symbol)
-	{
+	marketOrderBookBySymbol(symbol) {
 		let url = new URL(this.baseUrl + '/market/getorderbookbysymbol/' + symbol);
 		return this.getQuery(url);
 	}
 
-	marketOrderBookByMarketId(marketId)
-	{
+	marketOrderBookByMarketId(marketId) {
 		let url = new URL(this.baseUrl + '/market/getorderbookbymarketid/' + marketId);
 		return this.getQuery(url);
 	}
 
 	// Nomics Datafeed Format
 
-	getInfo():Promise<XeggexAPI.Infos>
-	{
+	getInfo(): Promise<Xeggex.Infos> {
 		let url = new URL(this.baseUrl + '/info');
 		return this.getQuery(url);
 	}
 
-	getMarkets()
-	{
+	getMarkets() {
 		let url = new URL(this.baseUrl + '/markets');
 		return this.getQuery(url);
 	}
 
-	getTrades(marketId, since = null)
-	{
+	getTrades(marketId, since = null) {
 		let url = new URL(this.baseUrl + '/trades');
 
-		let params:any=
+		let params: any =
 		{
 			market: marketId
 		}
 
-		if (since) params.since=since
+		if (since) params.since = since
 
 		url.search = new URLSearchParams(params).toString();
 		return this.getQuery(url);
 	}
 
-	getOrdersSnapshot(marketId)
-	{
+	getOrdersSnapshot(marketId:string) {
 		let url = new URL(this.baseUrl + '/orders/snapshot');
 		let params = {
 			market: marketId,
@@ -177,20 +157,17 @@ export class xeggexApi
 
 	// CoinGecko Datafeed Format
 
-	getPairs()
-	{
+	getPairs() {
 		let url = new URL(this.baseUrl + '/pairs');
 		return this.getQuery(url);
 	}
 
-	getTickers()
-	{
+	getTickers() {
 		let url = new URL(this.baseUrl + '/tickers');
 		return this.getQuery(url);
 	}
 
-	getOrderBook(tickerId, depth = 100)
-	{
+	getOrderBook(tickerId, depth = 100) {
 		let url = new URL(this.baseUrl + '/orderbook');
 		let params = {
 			ticker_id: tickerId,
@@ -200,8 +177,7 @@ export class xeggexApi
 		return this.getQuery(url);
 	}
 
-	getHistoricalSpotTrades(tickerId, limit = 100)
-	{
+	getHistoricalSpotTrades(tickerId, limit = 100) {
 		let url = new URL(this.baseUrl + '/historical_trades');
 		let params = {
 			ticker_id: tickerId,
@@ -211,8 +187,7 @@ export class xeggexApi
 		return this.getQuery(url);
 	}
 
-	getHistoricalPoolTrades(tickerId, limit = 100)
-	{
+	getHistoricalPoolTrades(tickerId, limit = 100) {
 		let url = new URL(this.baseUrl + '/historical_pooltrades');
 		let params = {
 			ticker_id: tickerId,
@@ -222,16 +197,14 @@ export class xeggexApi
 		return this.getQuery(url);
 	}
 
-	// Account
+	// Private API
 
-	balances(): Promise<XeggexAPI.Balance[]>
-	{
+	balances(): Promise<Xeggex.Balance[]> {
 		let url = new URL(this.baseUrl + '/balances');
 		return this.getQuery(url);
 	}
 
-	createOrder(symbol, side, quantity, price, type = 'limit', userProvidedId = null, strictValidate = false)
-	{
+	createOrder(symbol, side: Xeggex.Side, quantity, price, type: Xeggex.Type = 'limit', userProvidedId = null, strictValidate = false) {
 		let url = new URL(this.baseUrl + '/createorder');
 		let body = {
 			"userProvidedId": userProvidedId,
@@ -245,8 +218,7 @@ export class xeggexApi
 		return this.postQuery(url, body);
 	}
 
-	cancelOrder(orderId)
-	{
+	cancelOrder(orderId: string) {
 		let url = new URL(this.baseUrl + '/cancelorder');
 		let body = {
 			"id": orderId,
@@ -254,8 +226,7 @@ export class xeggexApi
 		return this.postQuery(url, body);
 	}
 
-	cancelAllOrders(symbol, side = 'all')
-	{
+	cancelAllOrders(symbol, side = 'all') {
 		let url = new URL(this.baseUrl + '/cancelallorders');
 		let body = {
 			"symbol": symbol,
@@ -264,8 +235,15 @@ export class xeggexApi
 		return this.postQuery(url, body);
 	}
 
-	getMyOrders(symbol = null, status = 'active', limit = 100, skip = 0)
-	{
+	/** @function getMyOrders
+	 *
+	 * Get a list of your spot market orders
+	 */
+
+	getMyOrders(symbol = null, // formatted like DOGE/BTC
+		status: Xeggex.Status = "active",
+		limit = 100,
+		skip = 0): Promise<Xeggex.Order[]> {
 		let url = new URL(this.baseUrl + '/getorders')
 
 		let params = {
@@ -273,15 +251,14 @@ export class xeggexApi
 			status: status,
 			limit: limit,
 			skip: skip,
-		};
+		}
 
 		url.search = new URLSearchParams(params as any).toString()
 
 		return this.getQuery(url);
 	}
 
-	getMyTrades(symbol = null, limit = 100, skip = 0)
-	{
+	getMyTrades(symbol = null, limit = 100, skip = 0) {
 		let url = new URL(this.baseUrl + '/gettrades');
 		let params = {
 			symbol: symbol,
@@ -292,8 +269,7 @@ export class xeggexApi
 		return this.getQuery(url);
 	}
 
-	getMyTradesSince(symbol = null, since = 0, limit = 100, skip = 0)
-	{
+	getMyTradesSince(symbol = null, since = 0, limit = 100, skip = 0) {
 		let url = new URL(this.baseUrl + '/gettradessince');
 		let params = {
 			symbol: symbol,
@@ -305,8 +281,7 @@ export class xeggexApi
 		return this.getQuery(url);
 	}
 
-	getMyPoolTrades(symbol = null, limit = 100, skip = 0)
-	{
+	getMyPoolTrades(symbol = null, limit = 100, skip = 0) {
 		let url = new URL(this.baseUrl + '/getpooltrades');
 		let params = {
 			symbol: symbol,
@@ -317,8 +292,7 @@ export class xeggexApi
 		return this.getQuery(url);
 	}
 
-	getMyPoolTradesSince(symbol = null, since = 0, limit = 100, skip = 0)
-	{
+	getMyPoolTradesSince(symbol = null, since = 0, limit = 100, skip = 0) {
 		let url = new URL(this.baseUrl + '/getpooltradessince');
 		let params = {
 			symbol: symbol,
